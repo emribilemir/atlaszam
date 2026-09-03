@@ -254,6 +254,21 @@ function printPetition() {
   window.print();
 }
 
+async function sharePetitionText(text, share) {
+  if (typeof share !== 'function') return 'unavailable';
+
+  try {
+    await share({
+      title: 'Öğrenim Ücreti İade Dilekçesi',
+      text,
+    });
+    return 'shared';
+  } catch (error) {
+    if (error?.name === 'AbortError') return 'cancelled';
+    return 'failed';
+  }
+}
+
 function initializeApp() {
   const form = document.querySelector('#petition-form');
   if (!form || !Array.isArray(window.ATLAS_DEPARTMENTS)) return;
@@ -403,6 +418,28 @@ function initializeApp() {
     }
   }
 
+  async function sharePetition() {
+    if (!currentPetition) return;
+
+    const text = petitionToPlainText(currentPetition);
+    const share = typeof navigator.share === 'function' ? navigator.share.bind(navigator) : undefined;
+    const result = await sharePetitionText(text, share);
+
+    if (result === 'shared') {
+      copyStatus.textContent = 'Dilekçe paylaşım menüsüne gönderildi.';
+      return;
+    }
+    if (result === 'cancelled') {
+      copyStatus.textContent = 'Paylaşım iptal edildi.';
+      return;
+    }
+
+    await copyPetition();
+    if (copyStatus.textContent === 'Dilekçe metni kopyalandı.') {
+      copyStatus.textContent = 'Paylaşım desteklenmediği için dilekçe metni kopyalandı.';
+    }
+  }
+
   updateFaculty();
   toggleListPrice();
 
@@ -446,6 +483,7 @@ function initializeApp() {
   });
 
   document.querySelector('#print-button').addEventListener('click', printPetition);
+  document.querySelector('#share-button').addEventListener('click', sharePetition);
   document.querySelector('#copy-button').addEventListener('click', copyPetition);
   document.querySelector('#edit-button').addEventListener('click', () => {
     resultSection.hidden = true;
@@ -473,6 +511,7 @@ if (typeof module !== 'undefined' && module.exports) {
     validateForm,
     generatePetition,
     petitionToPlainText,
+    sharePetitionText,
     renderPetition,
     printPetition,
   };

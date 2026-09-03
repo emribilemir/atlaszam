@@ -3,6 +3,8 @@ const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
 const { join } = require('node:path');
 
+const app = require('../app.js');
+
 const {
   parseMoney,
   formatMoney,
@@ -15,7 +17,7 @@ const {
   validateForm,
   generatePetition,
   petitionToPlainText,
-} = require('../app.js');
+} = app;
 
 function validForm(overrides = {}) {
   return {
@@ -112,6 +114,25 @@ test('liste fiyatı bilinmiyorsa rakam uydurmaz', () => {
   assert.match(text, /indirimsiz liste fiyatının baz alındığı iddia edilerek/);
   assert.doesNotMatch(text, /\(null TL\)|\[LİSTE FİYATI\]/);
   assert.match(text, /fiilen ödenen ücret yerine indirimsiz liste fiyatının baz alınmasının/);
+});
+
+test('dilekçe metnini yerel paylaşım menüsüne doğru içerikle gönderir', async () => {
+  assert.equal(typeof app.sharePetitionText, 'function');
+  let sharedData;
+  const result = await app.sharePetitionText('Dilekçe içeriği', async (data) => {
+    sharedData = data;
+  });
+
+  assert.equal(result, 'shared');
+  assert.deepEqual(sharedData, {
+    title: 'Öğrenim Ücreti İade Dilekçesi',
+    text: 'Dilekçe içeriği',
+  });
+});
+
+test('paylaşım desteği yoksa kopyalama fallback durumunu bildirir', async () => {
+  assert.equal(typeof app.sharePetitionText, 'function');
+  assert.equal(await app.sharePetitionText('Dilekçe içeriği'), 'unavailable');
 });
 
 test('Bilgisayar Mühendisliğini ilk sırada tutar ve lisansüstü program içermez', () => {
