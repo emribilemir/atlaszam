@@ -142,3 +142,22 @@ test('HTML zorunlu alanları, autofill niteliklerini ve gizlilik mesajını suna
   assert.match(html, /Girdiğiniz bilgiler cihazınızda işlenir\./);
   assert.match(html, /DİLEKÇEYİ OLUŞTUR/);
 });
+
+test('istemci kodu kalıcı depolama, ağ gönderimi ve güvensiz HTML sink kullanmaz', () => {
+  const source = readFileSync(join(__dirname, '..', 'app.js'), 'utf8');
+
+  assert.doesNotMatch(source, /localStorage|sessionStorage|indexedDB|fetch\s*\(|XMLHttpRequest/);
+  assert.doesNotMatch(source, /\.innerHTML\s*=/);
+  assert.match(source, /textContent\s*=/);
+  assert.match(source, /window\.print\(\)/);
+});
+
+test('stiller A4 yazdırmayı ve erişilebilir etkileşim durumlarını tanımlar', () => {
+  const css = readFileSync(join(__dirname, '..', 'style.css'), 'utf8');
+
+  assert.match(css, /width:\s*210mm/);
+  assert.match(css, /min-height:\s*297mm/);
+  assert.match(css, /@media print/);
+  assert.match(css, /:focus-visible/);
+  assert.match(css, /prefers-reduced-motion:\s*reduce/);
+});

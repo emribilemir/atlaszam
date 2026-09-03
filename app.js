@@ -188,6 +188,270 @@ function petitionToPlainText(model) {
   return `${model.heading}\n\nÖĞRENCİNİN:\n${studentLines}\n\nKONU : ${model.subject}\n\nAÇIKLAMALAR :\n\n${explanations}\n\nSONUÇ VE TALEP :\n\nYukarıda arz edilen nedenlerle;\n${requests} ${model.date}\n\n${model.signatureName}\n\nİmza\n\nEkler:\n${attachments}`;
 }
 
+function createElement(tagName, className, text) {
+  const element = document.createElement(tagName);
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
+  return element;
+}
+
+function appendLabeledParagraph(root, label, text) {
+  const paragraph = createElement('p', 'petition-labeled');
+  paragraph.append(createElement('strong', null, `${label} : `));
+  paragraph.append(document.createTextNode(text));
+  root.append(paragraph);
+}
+
+function renderPetition(model, root) {
+  root.replaceChildren();
+
+  root.append(createElement('h1', 'petition-title', model.heading));
+
+  const studentSection = createElement('section', 'petition-student');
+  studentSection.append(createElement('h2', 'petition-section-title', 'ÖĞRENCİNİN:'));
+  const studentList = createElement('dl', 'petition-details');
+  model.studentRows.forEach(([label, value]) => {
+    studentList.append(createElement('dt', null, label));
+    studentList.append(createElement('dd', null, value));
+  });
+  studentSection.append(studentList);
+  root.append(studentSection);
+
+  appendLabeledParagraph(root, 'KONU', model.subject);
+
+  root.append(createElement('h2', 'petition-section-title petition-body-title', 'AÇIKLAMALAR :'));
+  const explanationList = createElement('ol', 'petition-list');
+  model.explanations.forEach((paragraph) => {
+    explanationList.append(createElement('li', null, paragraph));
+  });
+  root.append(explanationList);
+
+  root.append(createElement('h2', 'petition-section-title petition-body-title', 'SONUÇ VE TALEP :'));
+  root.append(createElement('p', 'petition-lead', 'Yukarıda arz edilen nedenlerle;'));
+  const requestList = createElement('ol', 'petition-list petition-requests');
+  model.requests.forEach((request, index) => {
+    const suffix = index === model.requests.length - 1 ? ` ${model.date}` : '';
+    requestList.append(createElement('li', null, `${request}${suffix}`));
+  });
+  root.append(requestList);
+
+  const signature = createElement('div', 'petition-signature');
+  signature.append(createElement('strong', null, model.signatureName));
+  signature.append(createElement('span', null, 'İmza'));
+  root.append(signature);
+
+  const attachments = createElement('section', 'petition-attachments');
+  attachments.append(createElement('h2', 'petition-section-title', 'Ekler:'));
+  const attachmentList = createElement('ol');
+  model.attachments.forEach((attachment) => {
+    attachmentList.append(createElement('li', null, attachment));
+  });
+  attachments.append(attachmentList);
+  root.append(attachments);
+}
+
+function printPetition() {
+  window.print();
+}
+
+function initializeApp() {
+  const form = document.querySelector('#petition-form');
+  if (!form || !Array.isArray(window.ATLAS_DEPARTMENTS)) return;
+
+  const formPanel = document.querySelector('#form-panel');
+  const resultSection = document.querySelector('#result-section');
+  const resultHeading = document.querySelector('#result-heading');
+  const petitionPaper = document.querySelector('#petition-paper');
+  const departmentSelect = document.querySelector('#department');
+  const facultyInput = document.querySelector('#faculty');
+  const listPriceKnown = document.querySelector('#listPriceKnown');
+  const listPriceField = document.querySelector('#list-price-field');
+  const listPriceInput = document.querySelector('#listPrice');
+  const errorSummary = document.querySelector('#form-errors');
+  const copyStatus = document.querySelector('#copy-status');
+  let currentPetition = null;
+
+  const groups = new Map();
+  const quickGroup = createElement('optgroup');
+  quickGroup.label = 'Hızlı seçim';
+
+  window.ATLAS_DEPARTMENTS.forEach((department, index) => {
+    const option = createElement('option', null, department.name);
+    option.value = String(index);
+    if (index < 2) {
+      quickGroup.append(option);
+      return;
+    }
+
+    if (!groups.has(department.faculty)) {
+      const group = createElement('optgroup');
+      group.label = department.faculty;
+      groups.set(department.faculty, group);
+    }
+    groups.get(department.faculty).append(option);
+  });
+
+  departmentSelect.append(quickGroup, ...groups.values());
+  departmentSelect.value = '0';
+
+  function selectedDepartment() {
+    return window.ATLAS_DEPARTMENTS[Number(departmentSelect.value)];
+  }
+
+  function updateFaculty() {
+    facultyInput.value = selectedDepartment()?.faculty || '';
+  }
+
+  function toggleListPrice() {
+    const isKnown = listPriceKnown.checked;
+    listPriceField.hidden = !isKnown;
+    listPriceInput.required = isKnown;
+    listPriceKnown.setAttribute('aria-expanded', String(isKnown));
+    if (!isKnown) {
+      listPriceInput.value = '';
+      listPriceInput.removeAttribute('aria-invalid');
+      document.querySelector('#error-listPrice').textContent = '';
+    }
+  }
+
+  function collectFormData() {
+    const department = selectedDepartment();
+    return {
+      fullName: form.elements.fullName.value.trim(),
+      nationalId: form.elements.nationalId.value,
+      studentNumber: form.elements.studentNumber.value.trim(),
+      faculty: department?.faculty || '',
+      department: department?.name || '',
+      classLevel: form.elements.classLevel.value,
+      phone: form.elements.phone.value.trim(),
+      address: form.elements.address.value.trim(),
+      previousPaid: parseMoney(form.elements.previousPaid.value),
+      currentPaid: parseMoney(form.elements.currentPaid.value),
+      listPriceKnown: form.elements.listPriceKnown.checked,
+      listPrice: form.elements.listPriceKnown.checked
+        ? parseMoney(form.elements.listPrice.value)
+        : null,
+    };
+  }
+
+  function clearErrors() {
+    errorSummary.hidden = true;
+    errorSummary.replaceChildren();
+    form.querySelectorAll('[aria-invalid="true"]').forEach((field) => {
+      field.removeAttribute('aria-invalid');
+    });
+    form.querySelectorAll('.field-error').forEach((fieldError) => {
+      fieldError.textContent = '';
+    });
+  }
+
+  function showErrors(errors) {
+    const entries = Object.entries(errors);
+    if (!entries.length) return;
+
+    const heading = createElement('strong', null, 'Lütfen aşağıdaki alanları kontrol edin:');
+    const list = createElement('ul');
+    entries.forEach(([fieldName, message]) => {
+      const field = form.elements[fieldName];
+      if (field) field.setAttribute('aria-invalid', 'true');
+      const fieldError = document.querySelector(`#error-${fieldName}`);
+      if (fieldError) fieldError.textContent = message;
+      list.append(createElement('li', null, message));
+    });
+    errorSummary.append(heading, list);
+    errorSummary.hidden = false;
+
+    const firstField = form.elements[entries[0][0]];
+    if (firstField) firstField.focus();
+    else errorSummary.focus();
+  }
+
+  function showOverpaymentWarning() {
+    errorSummary.textContent = 'Girdiğiniz tutarlara göre %25 sınırının üzerinde bir tahsilat görünmüyor. Lütfen ödeme tutarlarını kontrol edin.';
+    errorSummary.hidden = false;
+    errorSummary.focus();
+  }
+
+  async function copyPetition() {
+    if (!currentPetition) return;
+    const text = petitionToPlainText(currentPetition);
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.className = 'copy-fallback';
+        document.body.append(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        textarea.remove();
+      }
+      copyStatus.textContent = 'Dilekçe metni kopyalandı.';
+    } catch {
+      copyStatus.textContent = 'Metin kopyalanamadı. Lütfen tekrar deneyin.';
+    }
+  }
+
+  updateFaculty();
+  toggleListPrice();
+
+  departmentSelect.addEventListener('change', updateFaculty);
+  listPriceKnown.addEventListener('change', toggleListPrice);
+
+  form.elements.nationalId.addEventListener('input', (event) => {
+    event.currentTarget.value = event.currentTarget.value.replace(/\D/g, '').slice(0, 11);
+  });
+
+  ['previousPaid', 'currentPaid', 'listPrice'].forEach((fieldName) => {
+    form.elements[fieldName].addEventListener('blur', (event) => {
+      const value = parseMoney(event.currentTarget.value);
+      if (value !== null) event.currentTarget.value = formatMoney(value).replace(/ TL$/, '');
+    });
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    clearErrors();
+
+    const data = collectFormData();
+    const errors = validateForm(data);
+    if (Object.keys(errors).length) {
+      showErrors(errors);
+      return;
+    }
+
+    const maxAllowed = calculateMaxAllowed(data.previousPaid);
+    if (calculateOverpayment(data.currentPaid, maxAllowed) <= 0) {
+      showOverpaymentWarning();
+      return;
+    }
+
+    currentPetition = generatePetition(data);
+    renderPetition(currentPetition, petitionPaper);
+    formPanel.hidden = true;
+    resultSection.hidden = false;
+    resultHeading.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  document.querySelector('#print-button').addEventListener('click', printPetition);
+  document.querySelector('#copy-button').addEventListener('click', copyPetition);
+  document.querySelector('#edit-button').addEventListener('click', () => {
+    resultSection.hidden = true;
+    formPanel.hidden = false;
+    copyStatus.textContent = '';
+    form.elements.fullName.focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     parseMoney,
@@ -201,5 +465,7 @@ if (typeof module !== 'undefined' && module.exports) {
     validateForm,
     generatePetition,
     petitionToPlainText,
+    renderPetition,
+    printPetition,
   };
 }
