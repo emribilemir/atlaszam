@@ -9,7 +9,29 @@ const {
   calculateIncreasePercentage,
   formatPercentage,
   formatDate,
+  isValidTurkishId,
+  validateForm,
+  generatePetition,
+  petitionToPlainText,
 } = require('../app.js');
+
+function validForm(overrides = {}) {
+  return {
+    fullName: 'Emir Bilici',
+    nationalId: '10000000146',
+    studentNumber: '202612345',
+    faculty: 'Mühendislik ve Doğa Bilimleri Fakültesi',
+    department: 'Bilgisayar Mühendisliği',
+    classLevel: '4. Sınıf',
+    phone: '0555 555 55 55',
+    address: 'Kağıthane / İstanbul',
+    previousPaid: 28_275_000,
+    currentPaid: 42_498_000,
+    listPriceKnown: false,
+    listPrice: null,
+    ...overrides,
+  };
+}
 
 test('desteklenen Türkçe para girişlerini kuruş integer değerine dönüştürür', () => {
   assert.equal(parseMoney('282750'), 28_275_000);
@@ -38,4 +60,54 @@ test('fiili zam yüzdesini hesaplar ve iki ondalıkla gösterir', () => {
 
 test('dilekçe tarihini gg.aa.yyyy biçiminde gösterir', () => {
   assert.equal(formatDate(new Date(2026, 8, 3)), '03.09.2026');
+});
+
+test('T.C. Kimlik No checksum değerini doğrular', () => {
+  assert.equal(isValidTurkishId('10000000146'), true);
+  assert.equal(isValidTurkishId('10000000145'), false);
+  assert.equal(isValidTurkishId('00000000000'), false);
+});
+
+test('zorunlu alanları ve pozitif ödeme tutarlarını doğrular', () => {
+  const errors = validateForm({
+    fullName: '',
+    nationalId: '123',
+    studentNumber: '',
+    faculty: '',
+    department: '',
+    classLevel: '',
+    phone: '',
+    address: '',
+    previousPaid: null,
+    currentPaid: 0,
+    listPriceKnown: false,
+    listPrice: null,
+  });
+
+  assert.equal(errors.fullName, 'Ad soyad alanı zorunludur.');
+  assert.equal(errors.nationalId, 'Geçerli bir T.C. Kimlik No girin.');
+  assert.equal(errors.previousPaid, 'Geçerli ve sıfırdan büyük bir tutar girin.');
+  assert.equal(errors.currentPaid, 'Geçerli ve sıfırdan büyük bir tutar girin.');
+});
+
+test('bilinen liste fiyatını sabit hukuki metne yerleştirir', () => {
+  const petition = generatePetition(
+    validForm({ listPriceKnown: true, listPrice: 35_757_000 }),
+    new Date(2026, 8, 3),
+  );
+  const text = petitionToPlainText(petition);
+
+  assert.match(text, /357\.570,00 TL/);
+  assert.match(text, /YÖK’ün emredici nitelikteki tavan kararının açık ihlalidir\./);
+  assert.match(text, /Bir önceki yıl fiilen ödenen nihai ücret yerine fiktif liste fiyatlarının baz alınması kanuna karşı hile teşkil etmekte olup YÖK düzenlemelerinde bu yönde bir istisna yer almamaktadır\./);
+  assert.match(text, /Emir Bilici\n\nİmza/);
+});
+
+test('liste fiyatı bilinmiyorsa rakam uydurmaz', () => {
+  const petition = generatePetition(validForm(), new Date(2026, 8, 3));
+  const text = petitionToPlainText(petition);
+
+  assert.match(text, /indirimsiz liste fiyatının baz alındığı iddia edilerek/);
+  assert.doesNotMatch(text, /\(null TL\)|\[LİSTE FİYATI\]/);
+  assert.match(text, /fiilen ödenen ücret yerine indirimsiz liste fiyatının baz alınmasının/);
 });
