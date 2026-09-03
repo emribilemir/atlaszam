@@ -161,3 +161,15 @@ test('stiller A4 yazdırmayı ve erişilebilir etkileşim durumlarını tanımla
   assert.match(css, /:focus-visible/);
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
 });
+
+test('README amaç, gizlilik, hukuki kapsam ve GitHub Pages kurulumunu açıklar', () => {
+  const readme = readFileSync(join(__dirname, '..', 'README.md'), 'utf8');
+
+  assert.match(readme, /## Projenin amacı/);
+  assert.match(readme, /## Kullanım/);
+  assert.match(readme, /## GitHub Pages/);
+  assert.match(readme, /## Gizlilik/);
+  assert.match(readme, /## Hukuki not/);
+  assert.match(readme, /kişisel bilgileri herhangi bir sunucuya göndermez/i);
+  assert.match(readme, /Settings.*Pages.*Deploy from a branch/s);
+});
