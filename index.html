@@ -40,33 +40,33 @@
 
         <div id="form-errors" class="error-summary" role="alert" tabindex="-1" hidden></div>
 
-        <form id="petition-form" novalidate>
+        <form id="petition-form" autocomplete="on" novalidate>
           <fieldset>
             <legend>Öğrenci bilgileri</legend>
 
             <div class="field">
               <label for="fullName">Ad Soyad</label>
-              <input id="fullName" name="fullName" type="text" autocomplete="name" required aria-describedby="error-fullName">
+              <input id="fullName" name="fullName" type="text" autocomplete="name" autocapitalize="words" enterkeyhint="next" required aria-describedby="error-fullName">
               <span class="field-error" id="error-fullName"></span>
             </div>
 
             <div class="field-grid">
               <div class="field">
                 <label for="nationalId">T.C. Kimlik No</label>
-                <input id="nationalId" name="nationalId" type="text" inputmode="numeric" maxlength="11" autocomplete="off" required aria-describedby="error-nationalId">
+                <input id="nationalId" name="nationalId" type="text" inputmode="numeric" maxlength="11" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" required aria-describedby="error-nationalId">
                 <span class="field-error" id="error-nationalId"></span>
               </div>
 
               <div class="field">
                 <label for="studentNumber">Öğrenci No</label>
-                <input id="studentNumber" name="studentNumber" type="text" inputmode="numeric" autocomplete="off" required aria-describedby="error-studentNumber">
+                <input id="studentNumber" name="studentNumber" type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" required aria-describedby="error-studentNumber">
                 <span class="field-error" id="error-studentNumber"></span>
               </div>
             </div>
 
             <div class="field">
               <label for="department">Bölüm</label>
-              <select id="department" name="department" required aria-describedby="department-note error-department"></select>
+              <select id="department" name="department" autocomplete="off" required aria-describedby="department-note error-department"></select>
               <small id="department-note">Bilgisayar Mühendisliği hızlı başlangıç için seçili gelir.</small>
               <span class="field-error" id="error-department"></span>
             </div>
@@ -74,13 +74,13 @@
             <div class="field-grid">
               <div class="field">
                 <label for="faculty">Fakülte / Yüksekokul</label>
-                <input id="faculty" name="faculty" type="text" readonly aria-describedby="faculty-note">
+                <input id="faculty" name="faculty" type="text" autocomplete="off" readonly aria-describedby="faculty-note">
                 <small id="faculty-note">Bölüm seçiminize göre otomatik belirlenir.</small>
               </div>
 
               <div class="field">
                 <label for="classLevel">Sınıf</label>
-                <select id="classLevel" name="classLevel" required aria-describedby="error-classLevel">
+                <select id="classLevel" name="classLevel" autocomplete="off" required aria-describedby="error-classLevel">
                   <option value="">Seçin</option>
                   <option>Hazırlık</option>
                   <option>1. Sınıf</option>
@@ -96,13 +96,13 @@
 
             <div class="field">
               <label for="phone">Telefon</label>
-              <input id="phone" name="phone" type="tel" autocomplete="tel" required aria-describedby="error-phone">
+              <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" enterkeyhint="next" required aria-describedby="error-phone">
               <span class="field-error" id="error-phone"></span>
             </div>
 
             <div class="field">
               <label for="address">Adres</label>
-              <textarea id="address" name="address" rows="3" autocomplete="street-address" required aria-describedby="error-address"></textarea>
+              <textarea id="address" name="address" rows="3" autocomplete="street-address" autocapitalize="sentences" enterkeyhint="next" required aria-describedby="error-address"></textarea>
               <span class="field-error" id="error-address"></span>
             </div>
           </fieldset>
@@ -114,7 +114,7 @@
             <div class="field">
               <label for="previousPaid">2025-2026 yılında fiilen ödenen toplam ücret</label>
               <div class="money-input">
-                <input id="previousPaid" name="previousPaid" type="text" inputmode="decimal" placeholder="282.750,00" required aria-describedby="money-help error-previousPaid">
+                <input id="previousPaid" name="previousPaid" type="text" inputmode="decimal" placeholder="282.750,00" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="next" required aria-describedby="money-help error-previousPaid">
                 <span aria-hidden="true">TL</span>
               </div>
               <small id="money-help">Örnek: 282750 veya 282.750,00</small>
@@ -124,7 +124,7 @@
             <div class="field">
               <label for="currentPaid">2026-2027 yılında fiilen ödenen toplam ücret</label>
               <div class="money-input">
-                <input id="currentPaid" name="currentPaid" type="text" inputmode="decimal" placeholder="424.980,00" required aria-describedby="error-currentPaid">
+                <input id="currentPaid" name="currentPaid" type="text" inputmode="decimal" placeholder="424.980,00" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" required aria-describedby="error-currentPaid">
                 <span aria-hidden="true">TL</span>
               </div>
               <span class="field-error" id="error-currentPaid"></span>
@@ -138,7 +138,7 @@
             <div id="list-price-field" class="field conditional-field" hidden>
               <label for="listPrice">Liste fiyatı</label>
               <div class="money-input">
-                <input id="listPrice" name="listPrice" type="text" inputmode="decimal" placeholder="357.570,00" aria-describedby="error-listPrice">
+                <input id="listPrice" name="listPrice" type="text" inputmode="decimal" placeholder="357.570,00" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-describedby="error-listPrice">
                 <span aria-hidden="true">TL</span>
               </div>
               <span class="field-error" id="error-listPrice"></span>

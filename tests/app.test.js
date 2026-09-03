@@ -135,10 +135,22 @@ test('HTML zorunlu alanları, autofill niteliklerini ve gizlilik mesajını suna
   assert.match(html, /autocomplete="name"/);
   assert.match(html, /autocomplete="tel"/);
   assert.match(html, /autocomplete="street-address"/);
+  assert.match(html, /<form id="petition-form" autocomplete="on" novalidate>/);
+  assert.match(
+    html,
+    /name="fullName"[^>]*autocomplete="name"[^>]*autocapitalize="words"/,
+  );
+  assert.match(
+    html,
+    /name="phone"[^>]*type="tel"[^>]*inputmode="tel"[^>]*autocomplete="tel"/,
+  );
   assert.match(
     html,
     /name="nationalId"[^>]*inputmode="numeric"[^>]*maxlength="11"[^>]*autocomplete="off"/,
   );
+  for (const fieldName of ['previousPaid', 'currentPaid', 'listPrice']) {
+    assert.match(html, new RegExp(`name="${fieldName}"[^>]*autocomplete="off"`));
+  }
   assert.match(html, /Girdiğiniz bilgiler cihazınızda işlenir\./);
   assert.match(html, /DİLEKÇEYİ OLUŞTUR/);
 });
