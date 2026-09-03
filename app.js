@@ -376,18 +376,27 @@ function initializeApp() {
     if (!currentPetition) return;
     const text = petitionToPlainText(currentPetition);
 
+    function copyWithTemporaryTextarea() {
+      const textarea = createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.className = 'copy-fallback';
+      document.body.append(textarea);
+      textarea.select();
+      const copied = document.execCommand('copy');
+      textarea.remove();
+      if (!copied) throw new Error('Legacy copy command failed.');
+    }
+
     try {
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          copyWithTemporaryTextarea();
+        }
       } else {
-        const textarea = createElement('textarea');
-        textarea.value = text;
-        textarea.setAttribute('readonly', '');
-        textarea.className = 'copy-fallback';
-        document.body.append(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        textarea.remove();
+        copyWithTemporaryTextarea();
       }
       copyStatus.textContent = 'Dilekçe metni kopyalandı.';
     } catch {
