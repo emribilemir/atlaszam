@@ -1,5 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
 
 const {
   parseMoney,
@@ -110,4 +112,33 @@ test('liste fiyatı bilinmiyorsa rakam uydurmaz', () => {
   assert.match(text, /indirimsiz liste fiyatının baz alındığı iddia edilerek/);
   assert.doesNotMatch(text, /\(null TL\)|\[LİSTE FİYATI\]/);
   assert.match(text, /fiilen ödenen ücret yerine indirimsiz liste fiyatının baz alınmasının/);
+});
+
+test('Bilgisayar Mühendisliğini ilk sırada tutar ve lisansüstü program içermez', () => {
+  const { ATLAS_DEPARTMENTS } = require('../data/departments.js');
+
+  assert.deepEqual(ATLAS_DEPARTMENTS[0], {
+    name: 'Bilgisayar Mühendisliği',
+    faculty: 'Mühendislik ve Doğa Bilimleri Fakültesi',
+  });
+  assert.equal(ATLAS_DEPARTMENTS.some(({ name }) => /\(YL\)|\(DR\)/.test(name)), false);
+  assert.equal(
+    ATLAS_DEPARTMENTS.some(({ faculty }) => faculty === 'Meslek Yüksekokulu'),
+    true,
+  );
+});
+
+test('HTML zorunlu alanları, autofill niteliklerini ve gizlilik mesajını sunar', () => {
+  const html = readFileSync(join(__dirname, '..', 'index.html'), 'utf8');
+
+  assert.match(html, /<html lang="tr">/);
+  assert.match(html, /autocomplete="name"/);
+  assert.match(html, /autocomplete="tel"/);
+  assert.match(html, /autocomplete="street-address"/);
+  assert.match(
+    html,
+    /name="nationalId"[^>]*inputmode="numeric"[^>]*maxlength="11"[^>]*autocomplete="off"/,
+  );
+  assert.match(html, /Girdiğiniz bilgiler cihazınızda işlenir\./);
+  assert.match(html, /DİLEKÇEYİ OLUŞTUR/);
 });

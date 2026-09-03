@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="İstanbul Atlas Üniversitesi öğrenim ücreti iade dilekçesini cihazınızda oluşturun ve yazdırın.">
+    <title>Öğrenim Ücreti İade Dilekçesi | İstanbul Atlas Üniversitesi</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="./data/departments.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Forma geç</a>
+
+    <header class="site-header" aria-labelledby="page-title">
+      <div class="header-inner">
+        <p class="eyebrow">İstanbul Atlas Üniversitesi öğrencileri için</p>
+        <h1 id="page-title">Öğrenim Ücreti İade<br>Dilekçesi Oluşturucu</h1>
+        <p class="intro">Bilgilerinizi ve ödediğiniz tutarları girin. Dilekçeniz otomatik hesaplansın ve yazdırmaya hazır olsun.</p>
+        <div class="ceiling-note" aria-label="Hesaplama bilgisi">
+          <strong>%25</strong>
+          <span>2026-2027 için kullanılan azami artış sınırı</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section id="form-panel" class="form-panel" aria-labelledby="form-heading">
+        <div class="section-heading">
+          <p class="step-label">Tek adım</p>
+          <h2 id="form-heading">Dilekçe bilgileri</h2>
+          <p>Zorunlu alanları doldurun. Hesaplamaları sizin yerinize yapacağız.</p>
+        </div>
+
+        <aside class="privacy-note" aria-label="Gizlilik bilgisi">
+          <span class="privacy-mark" aria-hidden="true">✓</span>
+          <p><strong>Bilgileriniz bu cihazda kalır.</strong><br>Girdiğiniz bilgiler cihazınızda işlenir. Kişisel bilgileriniz tarafımızca kaydedilmez veya bir sunucuya gönderilmez.</p>
+        </aside>
+
+        <div id="form-errors" class="error-summary" role="alert" tabindex="-1" hidden></div>
+
+        <form id="petition-form" novalidate>
+          <fieldset>
+            <legend>Öğrenci bilgileri</legend>
+
+            <div class="field">
+              <label for="fullName">Ad Soyad</label>
+              <input id="fullName" name="fullName" type="text" autocomplete="name" required aria-describedby="error-fullName">
+              <span class="field-error" id="error-fullName"></span>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="nationalId">T.C. Kimlik No</label>
+                <input id="nationalId" name="nationalId" type="text" inputmode="numeric" maxlength="11" autocomplete="off" required aria-describedby="error-nationalId">
+                <span class="field-error" id="error-nationalId"></span>
+              </div>
+
+              <div class="field">
+                <label for="studentNumber">Öğrenci No</label>
+                <input id="studentNumber" name="studentNumber" type="text" inputmode="numeric" autocomplete="off" required aria-describedby="error-studentNumber">
+                <span class="field-error" id="error-studentNumber"></span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="department">Bölüm</label>
+              <select id="department" name="department" required aria-describedby="department-note error-department"></select>
+              <small id="department-note">Bilgisayar Mühendisliği hızlı başlangıç için seçili gelir.</small>
+              <span class="field-error" id="error-department"></span>
+            </div>
+
+            <div class="field-grid">
+              <div class="field">
+                <label for="faculty">Fakülte / Yüksekokul</label>
+                <input id="faculty" name="faculty" type="text" readonly aria-describedby="faculty-note">
+                <small id="faculty-note">Bölüm seçiminize göre otomatik belirlenir.</small>
+              </div>
+
+              <div class="field">
+                <label for="classLevel">Sınıf</label>
+                <select id="classLevel" name="classLevel" required aria-describedby="error-classLevel">
+                  <option value="">Seçin</option>
+                  <option>Hazırlık</option>
+                  <option>1. Sınıf</option>
+                  <option>2. Sınıf</option>
+                  <option>3. Sınıf</option>
+                  <option>4. Sınıf</option>
+                  <option>5. Sınıf</option>
+                  <option>6. Sınıf</option>
+                </select>
+                <span class="field-error" id="error-classLevel"></span>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="phone">Telefon</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" required aria-describedby="error-phone">
+              <span class="field-error" id="error-phone"></span>
+            </div>
+
+            <div class="field">
+              <label for="address">Adres</label>
+              <textarea id="address" name="address" rows="3" autocomplete="street-address" required aria-describedby="error-address"></textarea>
+              <span class="field-error" id="error-address"></span>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Ödeme bilgileri</legend>
+            <p class="fieldset-help">Taksitleri ayrı ayrı değil, ilgili yıl için fiilen ödediğiniz toplam tutarı yazın.</p>
+
+            <div class="field">
+              <label for="previousPaid">2025-2026 yılında fiilen ödenen toplam ücret</label>
+              <div class="money-input">
+                <input id="previousPaid" name="previousPaid" type="text" inputmode="decimal" placeholder="282.750,00" required aria-describedby="money-help error-previousPaid">
+                <span aria-hidden="true">TL</span>
+              </div>
+              <small id="money-help">Örnek: 282750 veya 282.750,00</small>
+              <span class="field-error" id="error-previousPaid"></span>
+            </div>
+
+            <div class="field">
+              <label for="currentPaid">2026-2027 yılında fiilen ödenen toplam ücret</label>
+              <div class="money-input">
+                <input id="currentPaid" name="currentPaid" type="text" inputmode="decimal" placeholder="424.980,00" required aria-describedby="error-currentPaid">
+                <span aria-hidden="true">TL</span>
+              </div>
+              <span class="field-error" id="error-currentPaid"></span>
+            </div>
+
+            <div class="check-field">
+              <input id="listPriceKnown" name="listPriceKnown" type="checkbox" aria-controls="list-price-field" aria-expanded="false">
+              <label for="listPriceKnown">Üniversitenin baz aldığını söylediği 2025-2026 indirimsiz liste fiyatını biliyorum</label>
+            </div>
+
+            <div id="list-price-field" class="field conditional-field" hidden>
+              <label for="listPrice">Liste fiyatı</label>
+              <div class="money-input">
+                <input id="listPrice" name="listPrice" type="text" inputmode="decimal" placeholder="357.570,00" aria-describedby="error-listPrice">
+                <span aria-hidden="true">TL</span>
+              </div>
+              <span class="field-error" id="error-listPrice"></span>
+            </div>
+          </fieldset>
+
+          <button class="primary-button" type="submit">DİLEKÇEYİ OLUŞTUR</button>
+          <p class="submit-note">Tarih ve hesaplamalar otomatik olarak eklenecek.</p>
+        </form>
+      </section>
+
+      <section id="result-section" class="result-section" aria-labelledby="result-heading" hidden>
+        <div class="result-header">
+          <div>
+            <p class="step-label">Tamamlandı</p>
+            <h2 id="result-heading" tabindex="-1">Dilekçen hazır</h2>
+            <p>Bilgileri kontrol edin, ardından PDF olarak kaydedin veya yazdırın.</p>
+          </div>
+          <div class="result-actions" aria-label="Dilekçe işlemleri">
+            <button id="print-button" class="primary-button" type="button">PDF / Yazdır</button>
+            <button id="copy-button" class="secondary-button" type="button">Metni kopyala</button>
+            <button id="edit-button" class="text-button" type="button">Bilgileri düzenle</button>
+          </div>
+          <p id="copy-status" class="copy-status" aria-live="polite"></p>
+        </div>
+
+        <div id="petition-paper" class="petition-paper" role="document" aria-label="Oluşturulan dilekçe"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Bu araç hukuki danışmanlık hizmeti sunmaz; kullanıcı tarafından sağlanan mevcut dilekçe şablonunu doldurur.</p>
+    </footer>
+  </body>
+</html>
