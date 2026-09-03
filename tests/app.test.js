@@ -155,6 +155,16 @@ test('HTML zorunlu alanları, autofill niteliklerini ve gizlilik mesajını suna
   assert.match(html, /DİLEKÇEYİ OLUŞTUR/);
 });
 
+test('sayfa doğrudan forma başlar ve hızlı seçim ya da hero içermez', () => {
+  const html = readFileSync(join(__dirname, '..', 'index.html'), 'utf8');
+  const source = readFileSync(join(__dirname, '..', 'app.js'), 'utf8');
+
+  assert.doesNotMatch(html, /class="site-header"|class="ceiling-note"/);
+  assert.doesNotMatch(html, /department-note|hızlı başlangıç/i);
+  assert.doesNotMatch(source, /Hızlı seçim|quickGroup/);
+  assert.match(html, /<main id="main-content">\s*<section id="form-panel"/);
+});
+
 test('istemci kodu kalıcı depolama, ağ gönderimi ve güvensiz HTML sink kullanmaz', () => {
   const source = readFileSync(join(__dirname, '..', 'app.js'), 'utf8');
 

@@ -272,14 +272,13 @@ function initializeApp() {
   let currentPetition = null;
 
   const groups = new Map();
-  const quickGroup = createElement('optgroup');
-  quickGroup.label = 'Hızlı seçim';
+  const featuredOptions = [];
 
   window.ATLAS_DEPARTMENTS.forEach((department, index) => {
     const option = createElement('option', null, department.name);
     option.value = String(index);
     if (index < 2) {
-      quickGroup.append(option);
+      featuredOptions.push(option);
       return;
     }
 
@@ -291,7 +290,7 @@ function initializeApp() {
     groups.get(department.faculty).append(option);
   });
 
-  departmentSelect.append(quickGroup, ...groups.values());
+  departmentSelect.append(...featuredOptions, ...groups.values());
   departmentSelect.value = '0';
 
   function selectedDepartment() {

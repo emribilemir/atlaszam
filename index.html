@@ -13,29 +13,17 @@
   <body>
     <a class="skip-link" href="#main-content">Forma geç</a>
 
-    <header class="site-header" aria-labelledby="page-title">
-      <div class="header-inner">
-        <p class="eyebrow">İstanbul Atlas Üniversitesi öğrencileri için</p>
-        <h1 id="page-title">Öğrenim Ücreti İade<br>Dilekçesi Oluşturucu</h1>
-        <p class="intro">Bilgilerinizi ve ödediğiniz tutarları girin. Dilekçeniz otomatik hesaplansın ve yazdırmaya hazır olsun.</p>
-        <div class="ceiling-note" aria-label="Hesaplama bilgisi">
-          <strong>%25</strong>
-          <span>2026-2027 için kullanılan azami artış sınırı</span>
-        </div>
-      </div>
-    </header>
-
     <main id="main-content">
       <section id="form-panel" class="form-panel" aria-labelledby="form-heading">
         <div class="section-heading">
-          <p class="step-label">Tek adım</p>
+          <p class="step-label">İstanbul Atlas Üniversitesi öğrencileri için</p>
           <h2 id="form-heading">Dilekçe bilgileri</h2>
           <p>Zorunlu alanları doldurun. Hesaplamaları sizin yerinize yapacağız.</p>
         </div>
 
         <aside class="privacy-note" aria-label="Gizlilik bilgisi">
           <span class="privacy-mark" aria-hidden="true">✓</span>
-          <p><strong>Bilgileriniz bu cihazda kalır.</strong><br>Girdiğiniz bilgiler cihazınızda işlenir. Kişisel bilgileriniz tarafımızca kaydedilmez veya bir sunucuya gönderilmez.</p>
+          <p><strong>Bilgileriniz bu cihazda kalır.</strong> Girdiğiniz bilgiler cihazınızda işlenir. Kaydedilmez veya bir sunucuya gönderilmez.</p>
         </aside>
 
         <div id="form-errors" class="error-summary" role="alert" tabindex="-1" hidden></div>
@@ -66,8 +54,7 @@
 
             <div class="field">
               <label for="department">Bölüm</label>
-              <select id="department" name="department" autocomplete="off" required aria-describedby="department-note error-department"></select>
-              <small id="department-note">Bilgisayar Mühendisliği hızlı başlangıç için seçili gelir.</small>
+              <select id="department" name="department" autocomplete="off" required aria-describedby="error-department"></select>
               <span class="field-error" id="error-department"></span>
             </div>
 
